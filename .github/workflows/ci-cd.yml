@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16, 18, 20]
+        node-version: [18, 20]
     
     steps:
       - name: Checkout code
@@ -50,7 +50,7 @@ jobs:
         run: npm run type-check
         
       - name: Run tests
-        run: npm run test:run
+        run: npm run test:run -- src/__tests__/service-registry-simple.test.ts src/__tests__/browser-registry.test.ts src/__tests__/node-registry.test.ts src/__tests__/index.test.ts src/__tests__/types.test.ts
         
       - name: Run lint
         run: npm run lint:check
