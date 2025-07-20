@@ -4,10 +4,21 @@ module.exports = {
     browser: true,
     es2020: true
   },
-  extends: ['eslint:recommended'],
+  extends: [
+    'eslint:recommended',
+    '@typescript-eslint/recommended'
+  ],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module'
+  },
   rules: {
     // Basic rules for now
-    'no-unused-vars': 'warn',
-    'no-console': 'off'
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    'no-console': 'off',
+    '@typescript-eslint/no-explicit-any': 'off'
   }
 };

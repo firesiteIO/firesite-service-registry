@@ -55,10 +55,6 @@ describe('BrowserServiceRegistry', () => {
 
       expect(() => registry.configure(config)).not.toThrow();
     });
-
-    it('should return browser environment', () => {
-      expect(registry.getEnvironment()).toBe('browser');
-    });
   });
 
   describe('Service Registration', () => {
@@ -155,15 +151,9 @@ describe('BrowserServiceRegistry', () => {
         startedAt: '2025-01-20T00:00:00.000Z'
       };
 
-      const mockRegistry = {
-        services: {
-          'test-service': mockService
-        }
-      };
-
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => mockService
       });
 
       // First call should hit the API
@@ -184,157 +174,187 @@ describe('BrowserServiceRegistry', () => {
         startedAt: '2025-01-20T00:00:00.000Z'
       };
 
-      const mockRegistry = {
-        services: {
-          'test-service': mockService
-        }
-      };
-
       mockFetch
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => mockRegistry
+          json: async () => mockService
         });
 
-      const result = await registry.discover('test-service', { retries: 2 });
+      const result = await registry.discover('test-service', { retryAttempts: 2, retryDelay: 100 });
       expect(result).toEqual(mockService);
       expect(mockFetch).toHaveBeenCalledTimes(2);
-    });
-
-    it('should discover with health check included', async () => {
-      const mockService: ServiceInfo = {
-        name: 'test-service',
-        port: 3000,
-        status: 'running',
-        startedAt: '2025-01-20T00:00:00.000Z',
-        pid: 1234,
-        healthUrl: '/health',
-        healthCheckUrl: 'http://localhost:3000/health'
-      };
-
-      const mockRegistry = {
-        services: {
-          'test-service': mockService
-        }
-      };
-
-      mockFetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockRegistry
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ status: 'ok' })
-        });
-
-      const result = await registry.discover('test-service', { includeHealth: true });
-      expect(result).toMatchObject({
-        ...mockService,
-        isHealthy: true,
-        lastHealthCheck: expect.any(String)
-      });
     });
   });
 
   describe('Service Unregistration', () => {
-    it('should throw error when trying to unregister service in browser', async () => {
-      await expect(registry.unregister('test-service')).rejects.toThrow(ServiceRegistryError);
-      await expect(registry.unregister('test-service')).rejects.toThrow('Service unregistration is not supported in browser environment');
-    });
-  });
+    it('should unregister an existing service', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true })
+      });
 
-  describe('Health Checking', () => {
-    it('should check health by discovering service first', async () => {
+      await expect(registry.unregister('test-service')).resolves.toBeUndefined();
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/registry/unregister/test-service'),
+        expect.objectContaining({
+          method: 'DELETE'
+        })
+      );
+    });
+
+    it('should throw error when unregistering non-existent service', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      });
+
+      await expect(registry.unregister('non-existent-service')).rejects.toThrow(ServiceNotFoundError);
+    });
+
+    it('should handle unregistration API errors', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error'
+      });
+
+      await expect(registry.unregister('test-service')).rejects.toThrow(ServiceRegistryError);
+    });
+
+    it('should clear cache after unregistration', async () => {
+      // First register and discover a service (to cache it)
       const mockService: ServiceInfo = {
         name: 'test-service',
         port: 3000,
         status: 'running',
-        startedAt: '2025-01-20T00:00:00.000Z',
-        pid: 1234,
-        healthUrl: '/health',
-        healthCheckUrl: 'http://localhost:3000/health'
-      };
-
-      const mockRegistry = {
-        services: {
-          'test-service': mockService
-        }
-      };
-
-      mockFetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockRegistry
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ status: 'ok' })
-        });
-
-      const result = await registry.checkHealth('test-service');
-      expect(result).toBe(true);
-    });
-
-    it('should return false for non-existent service', async () => {
-      const mockRegistry = {
-        services: {}
+        startedAt: '2025-01-20T00:00:00.000Z'
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => mockService
       });
 
-      // Should throw ServiceNotFoundError for non-existent service
-      await expect(registry.checkHealth('non-existent-service')).rejects.toThrow(ServiceNotFoundError);
+      await registry.discover('test-service');
+
+      // Now unregister it
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true })
+      });
+
+      await registry.unregister('test-service');
+
+      // Next discovery should hit the API again (cache cleared)
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      });
+
+      const result = await registry.discover('test-service');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('Health Checking', () => {
+    it('should return true for healthy service', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ healthy: true })
+      });
+
+      const result = await registry.checkHealth('test-service');
+      expect(result).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/registry/health/test-service'),
+        expect.objectContaining({
+          method: 'GET'
+        })
+      );
+    });
+
+    it('should return false for unhealthy service', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ healthy: false })
+      });
+
+      const result = await registry.checkHealth('test-service');
+      expect(result).toBe(false);
+    });
+
+    it('should return false for non-existent service', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      });
+
+      const result = await registry.checkHealth('non-existent-service');
+      expect(result).toBe(false);
     });
 
     it('should handle CORS errors gracefully', async () => {
+      const corsError = new Error('NetworkError: Failed to fetch');
+      corsError.name = 'TypeError';
+      mockFetch.mockRejectedValueOnce(corsError);
+
+      const result = await registry.checkHealth('test-service');
+      expect(result).toBe(true); // Assumes service is running when CORS blocks the check
+    });
+
+    it('should handle health check with timeout option', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ healthy: true })
+      });
+
+      const result = await registry.checkHealth('test-service', { timeout: 5000 });
+      expect(result).toBe(true);
+    });
+
+    it('should direct health check when healthUrl is provided', async () => {
+      // First discover the service to get health URL
       const mockService: ServiceInfo = {
         name: 'test-service',
         port: 3000,
         status: 'running',
         startedAt: '2025-01-20T00:00:00.000Z',
+        healthUrl: '/health',
         healthCheckUrl: 'http://localhost:3000/health'
       };
 
-      const mockRegistry = {
-        services: {
-          'test-service': mockService
-        }
-      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockService
+      });
 
-      const corsError = new Error('Failed to fetch due to CORS policy violation');
-      corsError.name = 'TypeError';
+      await registry.discover('test-service');
 
-      mockFetch
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockRegistry
-        })
-        .mockRejectedValueOnce(corsError);
+      // Now check health - should use direct health URL
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 'ok' })
+      });
 
       const result = await registry.checkHealth('test-service');
-      expect(result).toBe(true); // Assumes service is running when CORS blocks the check
+      expect(result).toBe(true);
     });
   });
 
   describe('List Services', () => {
     it('should list all services', async () => {
-      const mockServices = {
-        'service1': { name: 'service1', port: 3000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' },
-        'service2': { name: 'service2', port: 4000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' }
-      };
-
-      const mockRegistry = {
-        services: mockServices
-      };
+      const mockServices: ServiceInfo[] = [
+        { name: 'service1', port: 3000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' },
+        { name: 'service2', port: 4000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' }
+      ];
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => mockServices
       });
 
       const result = await registry.listServices();
@@ -342,16 +362,18 @@ describe('BrowserServiceRegistry', () => {
       expect(result).toHaveLength(2);
       expect(result[0].name).toBe('service1');
       expect(result[1].name).toBe('service2');
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/registry/list'),
+        expect.objectContaining({
+          method: 'GET'
+        })
+      );
     });
 
     it('should return empty array when no services', async () => {
-      const mockRegistry = {
-        services: {}
-      };
-
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => []
       });
 
       const result = await registry.listServices();
@@ -371,32 +393,81 @@ describe('BrowserServiceRegistry', () => {
   });
 
   describe('Cleanup', () => {
-    it('should cleanup by clearing cache', async () => {
-      // First populate cache by discovering a service
-      const mockRegistry = {
-        services: {
-          'test-service': { name: 'test-service', port: 3000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' }
-        }
+    it('should cleanup stale services', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ cleaned: 2 })
+      });
+
+      await expect(registry.cleanup()).resolves.toBeUndefined();
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/registry/cleanup'),
+        expect.objectContaining({
+          method: 'POST'
+        })
+      );
+    });
+
+    it('should handle cleanup API errors', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error'
+      });
+
+      await expect(registry.cleanup()).rejects.toThrow(ServiceRegistryError);
+    });
+  });
+
+  describe('Caching', () => {
+    it('should cache discovered services', async () => {
+      const mockService: ServiceInfo = {
+        name: 'test-service',
+        port: 3000,
+        status: 'running',
+        startedAt: '2025-01-20T00:00:00.000Z'
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => mockService
       });
 
-      await registry.discover('test-service');
+      // First discovery should cache the result
+      const result1 = await registry.discover('test-service');
+      expect(result1).toEqual(mockService);
 
-      // Now cleanup (should clear cache)
-      await expect(registry.cleanup()).resolves.toBeUndefined();
+      // Second discovery should use cache
+      const result2 = await registry.discover('test-service');
+      expect(result2).toEqual(mockService);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
 
-      // Next discover should hit API again (cache cleared)
+    it('should invalidate cache after registration', async () => {
+      // First discover a service
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockRegistry
+        json: async () => ({ name: 'test-service', port: 3000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' })
       });
 
       await registry.discover('test-service');
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      // Register a service (should clear cache)
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true })
+      });
+
+      await registry.register('new-service', { port: 4000 });
+
+      // Next discovery should hit the API again
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ name: 'test-service', port: 3000, status: 'running', startedAt: '2025-01-20T00:00:00.000Z' })
+      });
+
+      await registry.discover('test-service');
+      expect(mockFetch).toHaveBeenCalledTimes(3); // discover + register + discover
     });
   });
 
@@ -404,7 +475,7 @@ describe('BrowserServiceRegistry', () => {
     it('should handle fetch network errors', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(registry.discover('test-service')).rejects.toThrow(ServiceRegistryError);
+      await expect(registry.register('test-service', { port: 3000 })).rejects.toThrow(ServiceRegistryError);
     });
 
     it('should handle JSON parsing errors', async () => {
@@ -424,11 +495,15 @@ describe('BrowserServiceRegistry', () => {
       });
 
       try {
-        await registry.discover('test-service');
+        await registry.register('test-service', { port: 3000 });
         expect.fail('Should have thrown an error');
       } catch (error) {
         expect(error).toBeInstanceOf(ServiceRegistryError);
-        expect((error as ServiceRegistryError).code).toBe('REGISTRY_UNAVAILABLE');
+        expect((error as ServiceRegistryError).code).toBe('API_ERROR');
+        expect((error as ServiceRegistryError).details).toMatchObject({
+          status: 400,
+          statusText: 'Bad Request'
+        });
       }
     });
   });

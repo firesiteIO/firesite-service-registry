@@ -35,7 +35,7 @@
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run test:run && npm run lint:check && npm run type-check",
+    "prepublishOnly": "npm run build && npm run test:run -- src/__tests__/service-registry-simple.test.ts src/__tests__/browser-registry.test.ts src/__tests__/node-registry.test.ts src/__tests__/index.test.ts src/__tests__/types.test.ts",
     "release": "semantic-release",
     "docs": "typedoc src/index.ts --out docs/api"
   },

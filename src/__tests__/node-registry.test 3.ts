@@ -22,19 +22,11 @@ vi.mock('fs', () => ({
 }));
 
 vi.mock('path', () => ({
-  default: {
-    dirname: vi.fn().mockReturnValue('/mock/dir'),
-    join: vi.fn().mockReturnValue('/mock/path/registry.json')
-  },
   dirname: vi.fn().mockReturnValue('/mock/dir'),
   join: vi.fn().mockReturnValue('/mock/path/registry.json')
 }));
 
 vi.mock('os', () => ({
-  default: {
-    tmpdir: vi.fn().mockReturnValue('/tmp'),
-    homedir: vi.fn().mockReturnValue('/home/user')
-  },
   tmpdir: vi.fn().mockReturnValue('/tmp'),
   homedir: vi.fn().mockReturnValue('/home/user')
 }));
@@ -52,9 +44,7 @@ describe('NodeServiceRegistry', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.kill = mockProcessKill;
-    registry = new NodeServiceRegistry({
-      registryPath: '/mock/path/registry.json'
-    });
+    registry = new NodeServiceRegistry();
   });
 
   afterEach(() => {
@@ -76,11 +66,8 @@ describe('NodeServiceRegistry', () => {
         retryAttempts: 5
       };
 
-      const customRegistry = new NodeServiceRegistry(config);
-      expect(customRegistry).toBeInstanceOf(NodeServiceRegistry);
-      if (customRegistry && typeof customRegistry.dispose === 'function') {
-        customRegistry.dispose();
-      }
+      registry = new NodeServiceRegistry(config);
+      expect(registry).toBeInstanceOf(NodeServiceRegistry);
     });
 
     it('should configure after instantiation', () => {
@@ -225,7 +212,7 @@ describe('NodeServiceRegistry', () => {
         .mockRejectedValueOnce(new Error('Temporary error'))
         .mockResolvedValueOnce(JSON.stringify(registryData));
 
-      const result = await registry.discover('test-service', { retries: 2 });
+      const result = await registry.discover('test-service', { retryAttempts: 2, retryDelay: 100 });
       expect(result).toEqual(mockService);
     });
 
@@ -328,8 +315,7 @@ describe('NodeServiceRegistry', () => {
         status: 'running',
         startedAt: '2025-01-20T00:00:00.000Z',
         pid: 99999, // Non-existent PID
-        healthUrl: '/health',
-        healthCheckUrl: 'http://localhost:3000/health'
+        healthUrl: '/health'
       };
 
       const registryData = {
@@ -339,9 +325,9 @@ describe('NodeServiceRegistry', () => {
 
       mockFs.readFile.mockResolvedValue(JSON.stringify(registryData));
       mockFs.writeFile.mockResolvedValue(undefined);
-      
-      // Mock fetch to simulate failed health check
-      global.fetch = vi.fn().mockRejectedValue(new Error('Connection refused'));
+      mockProcessKill.mockImplementation(() => {
+        throw new Error('ESRCH');
+      });
 
       const result = await registry.checkHealth('test-service');
       expect(result).toBe(false);
@@ -488,10 +474,7 @@ describe('NodeServiceRegistry', () => {
     });
 
     it('should handle cleanup interval', () => {
-      const registryWithInterval = new NodeServiceRegistry({ 
-        registryPath: '/mock/path/registry.json',
-        cleanupInterval: 1000 
-      });
+      const registryWithInterval = new NodeServiceRegistry({ cleanupInterval: 1000 });
       expect(() => registryWithInterval.dispose()).not.toThrow();
     });
   });

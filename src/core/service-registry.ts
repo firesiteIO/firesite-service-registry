@@ -144,7 +144,7 @@ export namespace ServiceRegistry {
    * Register a service (convenience method)
    */
   export async function register(name: string, options: RegisterOptions, config?: ServiceRegistryConfig): Promise<void> {
-    const registry = new ServiceRegistry(config);
+    const registry = ServiceRegistry.create(config);
     return registry.register(name, options);
   }
 
@@ -152,7 +152,7 @@ export namespace ServiceRegistry {
    * Discover a service (convenience method)
    */
   export async function discover(name: string, options?: DiscoverOptions, config?: ServiceRegistryConfig): Promise<ServiceInfo | null> {
-    const registry = new ServiceRegistry(config);
+    const registry = ServiceRegistry.create(config);
     return registry.discover(name, options);
   }
 
@@ -160,7 +160,7 @@ export namespace ServiceRegistry {
    * Check service health (convenience method)
    */
   export async function checkHealth(name: string, options?: HealthCheckOptions, config?: ServiceRegistryConfig): Promise<boolean> {
-    const registry = new ServiceRegistry(config);
+    const registry = ServiceRegistry.create(config);
     return registry.checkHealth(name, options);
   }
 
@@ -168,7 +168,7 @@ export namespace ServiceRegistry {
    * List all services (convenience method)
    */
   export async function listServices(config?: ServiceRegistryConfig): Promise<ServiceInfo[]> {
-    const registry = new ServiceRegistry(config);
+    const registry = ServiceRegistry.create(config);
     return registry.listServices();
   }
 
@@ -176,7 +176,7 @@ export namespace ServiceRegistry {
    * Unregister a service (convenience method)
    */
   export async function unregister(name: string, config?: ServiceRegistryConfig): Promise<void> {
-    const registry = new ServiceRegistry(config);
+    const registry = ServiceRegistry.create(config);
     return registry.unregister(name);
   }
 
@@ -184,7 +184,7 @@ export namespace ServiceRegistry {
    * Get current environment (convenience method)
    */
   export function getEnvironment(): Environment {
-    const registry = new ServiceRegistry();
+    const registry = ServiceRegistry.create();
     return registry.getEnvironment();
   }
 }
