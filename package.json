@@ -29,7 +29,7 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:run": "vitest run",
+    "test:run": "vitest run --config ./vitest.config.js",
     "lint": "eslint src/**/*.ts --fix",
     "lint:check": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
