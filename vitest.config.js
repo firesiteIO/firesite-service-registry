@@ -6,12 +6,6 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.{test,spec}.{js,ts}'],
     exclude: ['node_modules', 'dist'],
-    testTimeout: 10000,
-    mockReset: true,
-    clearMocks: true,
-    restoreMocks: true
-  },
-  esbuild: {
-    target: 'node18'
+    testTimeout: 10000
   }
 });
