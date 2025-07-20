@@ -44,8 +44,19 @@ export default defineConfig({
     restoreMocks: true
   },
   resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
-    }
+    alias: [
+      {
+        find: /^(\.\/.+)\.js$/,
+        replacement: '$1.ts'
+      },
+      {
+        find: /^(\.\.\/.+)\.js$/,
+        replacement: '$1.ts'
+      },
+      {
+        find: '@',
+        replacement: resolve(__dirname, 'src')
+      }
+    ]
   }
 });

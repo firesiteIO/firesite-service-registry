@@ -11,6 +11,8 @@ import {
   ServiceRegistryConfig,
   Environment,
 } from '../types/index.js';
+import { NodeServiceRegistry } from '../node/node-registry.js';
+import { BrowserServiceRegistry } from '../browser/browser-registry.js';
 
 export class ServiceRegistry implements IServiceRegistry {
   private implementation: IServiceRegistry;
@@ -128,14 +130,10 @@ export class ServiceRegistry implements IServiceRegistry {
   }
 
   private createNodeImplementation(config: ServiceRegistryConfig): IServiceRegistry {
-    // This will be dynamically imported at runtime
-    const NodeServiceRegistry = require('../node/node-registry.js').NodeServiceRegistry;
     return new NodeServiceRegistry(config);
   }
 
   private createBrowserImplementation(config: ServiceRegistryConfig): IServiceRegistry {
-    // This will be dynamically imported at runtime
-    const BrowserServiceRegistry = require('../browser/browser-registry.js').BrowserServiceRegistry;
     return new BrowserServiceRegistry(config);
   }
 }
