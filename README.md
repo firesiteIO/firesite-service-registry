@@ -22,6 +22,8 @@ The Firesite Service Registry provides a unified solution for service registrati
 npm install @firesite/service-registry
 ```
 
+> **Note**: Package is now live on NPM! 🎉
+
 Or with yarn:
 
 ```bash
