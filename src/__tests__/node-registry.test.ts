@@ -4,8 +4,6 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'fs';
-import path from 'path';
-import os from 'os';
 import { NodeServiceRegistry } from '../node/node-registry.js';
 import { ServiceRegistryError, ServiceNotFoundError } from '../types/index.js';
 import type { RegisterOptions, ServiceInfo } from '../types/index.js';
@@ -46,8 +44,6 @@ const mockProcessKill = vi.fn();
 describe('NodeServiceRegistry', () => {
   let registry: NodeServiceRegistry;
   const mockFs = fs as any;
-  const mockPath = path as any;
-  const mockOs = os as any;
   
   beforeEach(() => {
     vi.clearAllMocks();
