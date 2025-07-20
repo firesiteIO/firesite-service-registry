@@ -1,0 +1,55 @@
+# Source files
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Development files
+tsconfig.json
+vitest.config.ts
+.eslintrc.*
+.prettierrc.*
+.gitignore
+.github/
+.vscode/
+.idea/
+
+# Documentation (except README)
+docs/
+*.md
+!README.md
+!CHANGELOG.md
+
+# Build artifacts
+coverage/
+.nyc_output/
+*.tgz
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Dependencies (will be installed by consumer)
+node_modules/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/

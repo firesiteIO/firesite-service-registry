@@ -1,0 +1,140 @@
+{
+  "name": "@firesite/service-registry",
+  "version": "0.1.0",
+  "description": "Centralized service registry for the Firesite ecosystem, enabling dynamic service discovery and port orchestration",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run build:types && npm run build:esm && npm run build:cjs",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.esm.js --external:fs --external:path --external:os --external:node-fetch --platform=neutral",
+    "build:cjs": "esbuild src/index.ts --bundle --format=cjs --outfile=dist/index.js --external:fs --external:path --external:os --external:node-fetch --platform=neutral",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run",
+    "lint": "eslint src/**/*.ts --fix",
+    "lint:check": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run test:run && npm run lint:check && npm run type-check",
+    "release": "semantic-release",
+    "docs": "typedoc src/index.ts --out docs/api"
+  },
+  "keywords": [
+    "firesite",
+    "service-registry",
+    "service-discovery",
+    "port-orchestration",
+    "microservices",
+    "development-tools",
+    "nodejs",
+    "browser",
+    "typescript"
+  ],
+  "author": {
+    "name": "Firesite Team",
+    "email": "team@firesite.io",
+    "url": "https://firesite.io"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firesiteIO/firesite-service-registry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/firesiteIO/firesite-service-registry/issues"
+  },
+  "homepage": "https://github.com/firesiteIO/firesite-service-registry#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/node-fetch": "^2.6.12",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "esbuild": "^0.19.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "semantic-release": "^22.0.0",
+    "typedoc": "^0.25.0",
+    "typescript": "^5.2.0",
+    "vitest": "^1.0.0"
+  },
+  "optionalDependencies": {
+    "node-fetch": "^3.3.0"
+  },
+  "volta": {
+    "node": "18.18.0",
+    "npm": "9.8.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ],
+  "eslintConfig": {
+    "extends": [
+      "@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": "error",
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/explicit-function-return-type": "warn"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/github"
+    ]
+  }
+}
