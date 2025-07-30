@@ -17,11 +17,11 @@ const FIRESITE_CONFIG = {
   firebase: {
     projectId: "firesitetest",
     databaseURL: "https://firesitetest-default-rtdb.firebaseio.com",
-    apiKey: "AIzaSyAE7oFyreBMSYk5oQc_AA-SLILyck2bWXI",
-    authDomain: "firesitetest.firebaseapp.com",
-    storageBucket: "firesitetest.appspot.com",
-    messagingSenderId: "1043591405738",
-    appId: "1:1043591405738:web:b199a8743a40d25db4b0d3"
+    // API key should be set via environment variable FIREBASE_API_KEY
+    // authDomain: "firesitetest.firebaseapp.com",
+    // storageBucket: "firesitetest.appspot.com", 
+    // messagingSenderId: "1043591405738",
+    // appId: "1:1043591405738:web:b199a8743a40d25db4b0d3"
   },
   registry: {
     defaultMode: "firebase",
@@ -104,6 +104,9 @@ export FIRESITE_USE_FIREBASE=true
 # Firebase project configuration (Firesite Alpha - firesitetest)
 export FIREBASE_PROJECT_ID=firesitetest
 export FIREBASE_DATABASE_URL=https://firesitetest-default-rtdb.firebaseio.com
+
+# Firebase API key (required for client-side access)
+# export FIREBASE_API_KEY=your-firebase-api-key
 
 # Optional: Firebase Admin SDK credentials (if you have a service account)
 # export FIREBASE_PRIVATE_KEY_ID=your-private-key-id
