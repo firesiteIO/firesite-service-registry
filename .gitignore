@@ -141,3 +141,19 @@ vite.config.ts.timestamp-*
 # OS
 .DS_Store
 Thumbs.db
+
+# Firebase configuration files with potential secrets
+.firesite-config.json
+config.json
+firebase-keys.json
+service-account-key.json
+
+# Files that might contain API keys or secrets
+*-secrets.*
+*-keys.*
+*.secret
+setup-firebase-with-keys.js
+
+# Service registry runtime files
+registry.json
+.firesite/

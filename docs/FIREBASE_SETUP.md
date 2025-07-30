@@ -79,7 +79,7 @@ Go to [Firebase Console](https://console.firebase.google.com/project/firesitetes
   "firebase": {
     "projectId": "firesitetest",
     "databaseURL": "https://firesitetest-default-rtdb.firebaseio.com",
-    "apiKey": "AIzaSyAE7oFyreBMSYk5oQc_AA-SLILyck2bWXI",
+    "apiKey": "YOUR_FIREBASE_API_KEY_HERE",
     "authDomain": "firesitetest.firebaseapp.com",
     "storageBucket": "firesitetest.appspot.com",
     "messagingSenderId": "1043591405738",
