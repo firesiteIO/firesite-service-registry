@@ -121,8 +121,12 @@ export class ServiceRegistry implements IServiceRegistry {
 
   private createImplementation(config: ServiceRegistryConfig): IServiceRegistry {
     if (this.environment === 'node') {
-      // Dynamic import for Node.js implementation
-      return this.createNodeImplementation(config);
+      // Check if Firebase mode is enabled
+      if (config.useFirebase || (typeof process !== 'undefined' && process.env?.FIRESITE_USE_FIREBASE === 'true')) {
+        return this.createFirebaseImplementation(config);
+      } else {
+        return this.createNodeImplementation(config);
+      }
     } else {
       // Dynamic import for browser implementation
       return this.createBrowserImplementation(config);
@@ -131,6 +135,17 @@ export class ServiceRegistry implements IServiceRegistry {
 
   private createNodeImplementation(config: ServiceRegistryConfig): IServiceRegistry {
     return new NodeServiceRegistry(config);
+  }
+
+  private createFirebaseImplementation(config: ServiceRegistryConfig): IServiceRegistry {
+    try {
+      // Dynamic import to avoid requiring Firebase in all cases
+      const { FirebaseServiceRegistry } = require('../node/firebase-registry.js');
+      return new FirebaseServiceRegistry(config);
+    } catch (error) {
+      console.warn('Firebase not available, falling back to file-based registry:', error);
+      return new NodeServiceRegistry(config);
+    }
   }
 
   private createBrowserImplementation(config: ServiceRegistryConfig): IServiceRegistry {

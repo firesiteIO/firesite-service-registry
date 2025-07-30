@@ -21,8 +21,8 @@
   "scripts": {
     "build": "npm run clean && npm run build:types && npm run build:esm && npm run build:cjs",
     "build:types": "tsc --emitDeclarationOnly --outDir dist",
-    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.esm.js --external:fs --external:path --external:os --external:node-fetch --platform=neutral",
-    "build:cjs": "esbuild src/index.ts --bundle --format=cjs --outfile=dist/index.js --external:fs --external:path --external:os --external:node-fetch --platform=neutral",
+    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.esm.js --external:fs --external:path --external:os --external:url --external:node-fetch --platform=node",
+    "build:cjs": "esbuild src/index.ts --bundle --format=cjs --outfile=dist/index.js --external:fs --external:path --external:os --external:url --external:node-fetch --platform=node",
     "clean": "rm -rf dist",
     "dev": "tsc --watch",
     "test": "vitest",
@@ -35,7 +35,7 @@
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
     "type-check": "tsc --noEmit",
-    "prepublishOnly": "npm run build && npm run test:run -- src/__tests__/service-registry-simple.test.ts src/__tests__/browser-registry.test.ts src/__tests__/node-registry.test.ts src/__tests__/index.test.ts src/__tests__/types.test.ts",
+    "prepublishOnly": "npm run build && npm run test:run -- __tests__/service-registry-simple.test.ts __tests__/browser-registry.test.ts __tests__/node-registry.test.ts __tests__/index.test.ts __tests__/types.test.ts",
     "release": "semantic-release",
     "docs": "typedoc src/index.ts --out docs/api"
   },
@@ -89,6 +89,7 @@
     "vitest": "^3.2.4"
   },
   "optionalDependencies": {
+    "firebase-admin": "^12.7.0",
     "node-fetch": "^3.3.0"
   },
   "volta": {

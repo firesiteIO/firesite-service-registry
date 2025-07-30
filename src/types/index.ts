@@ -96,6 +96,10 @@ export interface ServiceRegistryConfig {
   cleanupInterval?: number;
   /** Service timeout before considered stale in ms */
   serviceTimeout?: number;
+  /** Firebase configuration for real-time registry */
+  firebaseConfig?: any;
+  /** Use Firebase Realtime Database for registry */
+  useFirebase?: boolean;
 }
 
 /**

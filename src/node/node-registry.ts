@@ -20,7 +20,15 @@ import {
 } from '../types/index.js';
 
 export class NodeServiceRegistry implements IServiceRegistry {
-  private config: Required<ServiceRegistryConfig>;
+  private config: ServiceRegistryConfig & {
+    registryPath: string;
+    registryApiUrl: string;
+    healthCheckTimeout: number;
+    retryAttempts: number;
+    retryDelay: number;
+    cleanupInterval: number;
+    serviceTimeout: number;
+  };
   private cleanupTimer?: NodeJS.Timeout | undefined;
 
   constructor(config: ServiceRegistryConfig = {}) {
@@ -32,6 +40,8 @@ export class NodeServiceRegistry implements IServiceRegistry {
       retryDelay: 1000,
       cleanupInterval: 60000, // 1 minute
       serviceTimeout: 300000, // 5 minutes
+      firebaseConfig: undefined,
+      useFirebase: false,
       ...config,
     };
 

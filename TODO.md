@@ -1,7 +1,7 @@
 # TODO - @firesite/service-registry
 
-**Last Updated**: 2025-07-20 by Claude Code  
-**Status**: ✅ PUBLISHED & WORKING - v0.1.0 live on NPM with automated CI/CD
+**Last Updated**: 2025-07-30 by Claude Code  
+**Status**: 🔥 FIREBASE INTEGRATED - Enhanced with Firebase RTDB and multi-user isolation
 
 ## 🎉 Major Milestones Completed
 
@@ -25,18 +25,46 @@
 - [x] Verified CLI functionality with NPM package
 - [x] Production testing completed successfully
 
-## 🔧 Current Cleanup Tasks
+### 🔥 Phase 4: Firebase Integration (JULY 30, 2025)
+- [x] **Firebase Realtime Database Implementation** - Complete Firebase RTDB integration with real-time presence
+- [x] **Multi-User Isolation System** - User-specific namespacing (`firesite-dev/users/{userId}/services`)
+- [x] **Intelligent User ID Generation** - Git email → system username → unique ID fallback chain
+- [x] **ES Module Compatibility** - Fixed `__dirname` issues for Firebase integration in ES modules
+- [x] **Enhanced Service Metadata** - Rich service information including capabilities and user context
+- [x] **Graceful Fallback Architecture** - Robust fallback to file-based registry when Firebase unavailable
+- [x] **Cross-Project Package Updates** - Updated all 5 Firesite services with enhanced registry
+- [x] **Comprehensive Testing Framework** - Unit tests for Firebase integration and multi-user scenarios
 
-### ESLint Warning Cleanup (Low Priority)
-*From CI/CD Pipeline Annotations - 10 warnings to resolve:*
+## 🚨 Critical Issues - Next Session Priority
 
-- [ ] Remove unused `afterEach` import in `src/__tests__/browser-registry.test.ts:5`
-- [ ] Remove unused `ServiceInfo` import in `src/__tests__/service-registry.test.ts:7`  
-- [ ] Remove unused `ServiceRegistryType` import in `src/__tests__/types.test.ts:8`
-- [ ] Remove unused `DiscoverOptions` import in `src/__tests__/types.test.ts:10`
-- [ ] Remove unused `HealthCheckOptions` import in `src/__tests__/types.test.ts:11`
+### 1. Service Self-Registration Implementation (CRITICAL)
+**Status**: 🔴 Services not successfully using ServiceRegistry.register()
+**Context**: All services have the package but registration calls are failing/not working
+**Tasks**:
+- [ ] Debug why ServiceRegistry.register() calls are not working in service startup
+- [ ] Fix CLI vs service registry conflict (CLI overwriting service registrations with PID: -1)
+- [ ] Add comprehensive error logging to service registration calls
+- [ ] Test each service's ServiceRegistry import and usage
+- [ ] Document service integration requirements and troubleshooting
 
-*Note: These are non-blocking ESLint warnings that don't affect functionality*
+### 2. Firebase Admin SDK Integration (HIGH)
+**Status**: 🟡 Partial - Firebase code works but admin.getApps issue
+**Context**: Firebase Admin SDK import failing with "admin.getApps is not a function"
+**Tasks**:
+- [ ] Fix Firebase Admin SDK dynamic import for better compatibility
+- [ ] Set up proper Firebase service account authentication
+- [ ] Configure Firebase RTDB security rules for development environment
+- [ ] Test Firebase integration with actual RTDB connectivity
+- [ ] Document Firebase setup and authentication requirements
+
+### 3. Test Module Resolution Issues (MEDIUM)
+**Status**: 🟡 Some tests failing due to module import issues
+**Context**: Dynamic Firebase imports causing test framework conflicts
+**Tasks**:
+- [ ] Fix test module import issues for Firebase registry tests
+- [ ] Ensure all unit tests pass consistently
+- [ ] Improve test mocking for Firebase components
+- [ ] Add integration tests for full service registration flow
 
 ## 🚀 Future Enhancement Opportunities
 

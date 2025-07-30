@@ -1,0 +1,24 @@
+{
+  "firebase": {
+    "projectId": "firesitetest",
+    "databaseURL": "https://firesitetest-default-rtdb.firebaseio.com",
+    "apiKey": "AIzaSyAE7oFyreBMSYk5oQc_AA-SLILyck2bWXI",
+    "authDomain": "firesitetest.firebaseapp.com",
+    "storageBucket": "firesitetest.appspot.com",
+    "messagingSenderId": "1043591405738",
+    "appId": "1:1043591405738:web:b199a8743a40d25db4b0d3"
+  },
+  "registry": {
+    "defaultMode": "firebase",
+    "fallbackToFile": true,
+    "rtdbPath": "firesite-dev/services",
+    "presencePath": "firesite-dev/presence",
+    "healthCheckInterval": 30000,
+    "cleanupInterval": 60000
+  },
+  "development": {
+    "autoCleanup": true,
+    "verboseLogging": false,
+    "gracePeriod": 30000
+  }
+}
