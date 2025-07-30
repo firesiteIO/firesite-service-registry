@@ -12,6 +12,9 @@ export { ServiceRegistry } from './core/service-registry.js';
 export { NodeServiceRegistry } from './node/node-registry.js';
 export { BrowserServiceRegistry } from './browser/browser-registry.js';
 
+// Firebase implementation (optional)
+export { FirebaseServiceRegistry } from './node/firebase-registry.js';
+
 // Types and interfaces
 export type {
   ServiceInfo,

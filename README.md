@@ -8,6 +8,7 @@ The Firesite Service Registry provides a unified solution for service registrati
 
 ## Features
 
+### Core Registry Capabilities
 - **Dual Environment Support**: Works seamlessly in both Node.js (file-based) and browser (HTTP API-based) environments
 - **Dynamic Port Discovery**: Services can discover each other's ports at runtime
 - **Health Monitoring**: Built-in health check capabilities for all registered services
@@ -15,6 +16,20 @@ The Firesite Service Registry provides a unified solution for service registrati
 - **TypeScript Support**: Full type definitions for better developer experience
 - **Zero Configuration**: Works out of the box with sensible defaults
 - **Retry Logic**: Built-in retry mechanisms for resilient service discovery
+
+### 🔥 Firebase Realtime Database Integration (NEW)
+- **Event-Driven Architecture**: Real-time service registration and discovery using Firebase RTDB
+- **Multi-User Isolation**: User-specific service namespacing (`firesite-dev/users/{userId}/services`)
+- **Intelligent User ID Generation**: Git email → system username → unique ID fallback chain
+- **Real-Time Presence Detection**: Automatic service cleanup on disconnect using Firebase presence
+- **Graceful Fallback**: Seamless fallback to file-based registry when Firebase unavailable
+- **Enhanced Service Metadata**: Rich service information including capabilities and user context
+
+### Enhanced CLI Integration
+- **Professional Status Display**: Beautiful service status tables with comprehensive information
+- **Health Check Integration**: Enhanced health verification using both PID and HTTP health checks
+- **Process Management**: Proper PID tracking and process lifecycle management
+- **Cross-Project Compatibility**: Works across all Firesite ecosystem projects
 
 ## Installation
 

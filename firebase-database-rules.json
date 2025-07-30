@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "firesite-dev": {
+      ".read": true,
+      ".write": true,
+      "services": {
+        "$service": {
+          ".validate": "newData.hasChildren(['name', 'port', 'status', 'startedAt'])"
+        }
+      },
+      "presence": {
+        "$service": {
+          ".validate": "newData.hasChildren(['online', 'lastSeen'])"
+        }
+      }
+    }
+  }
+}

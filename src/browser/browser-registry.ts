@@ -5,7 +5,7 @@
 import {
   IServiceRegistry,
   ServiceInfo,
-  ServiceRegistry,
+  ServiceRegistry as ServiceRegistryType,
   RegisterOptions,
   DiscoverOptions,
   HealthCheckOptions,
@@ -17,8 +17,16 @@ import {
 } from '../types/index.js';
 
 export class BrowserServiceRegistry implements IServiceRegistry {
-  private config: Required<ServiceRegistryConfig>;
-  private cache: Map<string, { data: ServiceRegistry; timestamp: number }> = new Map();
+  private config: ServiceRegistryConfig & {
+    registryPath: string;
+    registryApiUrl: string;
+    healthCheckTimeout: number;
+    retryAttempts: number;
+    retryDelay: number;
+    cleanupInterval: number;
+    serviceTimeout: number;
+  };
+  private cache: Map<string, { data: ServiceRegistryType; timestamp: number }> = new Map();
   private readonly CACHE_TTL = 5000; // 5 seconds
 
   constructor(config: ServiceRegistryConfig = {}) {
@@ -30,6 +38,8 @@ export class BrowserServiceRegistry implements IServiceRegistry {
       retryDelay: 1000,
       cleanupInterval: 60000, // Not used in browser
       serviceTimeout: 300000, // Not used in browser
+      firebaseConfig: undefined,
+      useFirebase: false,
       ...config,
     };
   }
@@ -192,7 +202,7 @@ export class BrowserServiceRegistry implements IServiceRegistry {
 
   // Private methods
 
-  private async fetchRegistry(): Promise<ServiceRegistry> {
+  private async fetchRegistry(): Promise<ServiceRegistryType> {
     const cacheKey = this.config.registryApiUrl;
     const now = Date.now();
     
@@ -221,7 +231,7 @@ export class BrowserServiceRegistry implements IServiceRegistry {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const registry: ServiceRegistry = await response.json();
+      const registry: ServiceRegistryType = await response.json();
       
       // Cache the result
       this.cache.set(cacheKey, { data: registry, timestamp: now });
