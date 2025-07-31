@@ -62,9 +62,9 @@
 - **CI/CD Status**: ✅ Working with pragmatic validation
 
 ### Projects to Migrate (Next Session)
-- **firesite-chat-service**: /Users/thomasbutler/Documents/Firesite/firesite-chat-service
+- **firesite-chat-service**: /Users/thomasbutler/development/Firesite/firesite-chat-service
   - File: utils/service-registry.js (to be replaced)
-- **firesite-mcp-max**: /Users/thomasbutler/Documents/Firesite/firesite-mcp-max
+- **firesite-mcp-max**: /Users/thomasbutler/development/Firesite/firesite-mcp-max
   - File: utils/service-registry.js (to be replaced)
 
 ### Already Migrated
